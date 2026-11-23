@@ -1,39 +1,12 @@
 <!DOCTYPE html>
-<html lang="de" data-theme="light">
+<html lang="de">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="color-scheme" content="light dark">
+  <meta name="color-scheme" content="dark">
   <title>HTML / Text Diff - Lokaler Vergleich</title>
   <style>
     :root {
-      color-scheme: light;
-      --page: #f5f7fb;
-      --surface: #ffffff;
-      --surface-2: #f8fafc;
-      --surface-3: #edf2f8;
-      --text: #1a2636;
-      --muted: #64748b;
-      --border: #dfe6ef;
-      --border-strong: #cbd5e1;
-      --accent: #405fe7;
-      --accent-hover: #304ac5;
-      --accent-soft: #eef1ff;
-      --focus: #7890ff;
-      --red: #b42335;
-      --red-bg: #fff0f1;
-      --red-strong: #ffccd3;
-      --green: #167547;
-      --green-bg: #eaf8f0;
-      --green-strong: #b5e9ca;
-      --yellow: #8a6100;
-      --yellow-bg: #fff9e7;
-      --yellow-border: #f2d483;
-      --shadow: 0 14px 42px rgba(35, 49, 79, .055);
-      --code: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-      --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    }
-    html[data-theme="dark"] {
       color-scheme: dark;
       --page: #0e1420;
       --surface: #151e2d;
@@ -57,6 +30,8 @@
       --yellow-bg: #443920;
       --yellow-border: #77612b;
       --shadow: 0 18px 48px rgba(0, 0, 0, .16);
+      --code: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
     *, *::before, *::after { box-sizing: border-box; }
     body { margin: 0; background: var(--page); color: var(--text); font-family: var(--sans); line-height: 1.5; }
@@ -65,21 +40,10 @@
     button:disabled { opacity: .5; cursor: not-allowed; }
     :focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
     .app { max-width: 1500px; padding: 31px clamp(15px, 3.1vw, 46px) 44px; margin: 0 auto; }
-    .topbar, .brand, .head-right, .actions, .options, .option-group,
-    .section-heading, .result-controls, .stats, .legend, .editor-heading { display: flex; align-items: center; }
-    .topbar { justify-content: space-between; gap: 16px; margin-bottom: 27px; }
-    .brand { gap: 13px; }
-    .brand-mark { display: grid; place-items: center; width: 47px; height: 47px; border-radius: 15px; color: white; background: linear-gradient(140deg, #546af6, #774de5); box-shadow: 0 8px 19px rgba(84,106,246,.19); }
-    .brand-mark svg { width: 27px; height: 27px; }
-    .overline { display: block; color: var(--muted); font-size: 10px; font-weight: 800; letter-spacing: 1.8px; text-transform: uppercase; }
-    h1 { margin: 1px 0 0; font-size: clamp(19px, 2.7vw, 26px); line-height: 1.2; letter-spacing: -.7px; font-weight: 760; }
-    .head-right { gap: 11px; }
-    .privacy { color: var(--green); background: var(--green-bg); border: 1px solid var(--border); padding: 7px 11px; border-radius: 100px; font-size: 12px; font-weight: 700; white-space: nowrap; }
-    .privacy::before { content: ""; display: inline-block; width: 7px; height: 7px; margin-right: 6px; border-radius: 50%; background: #20b876; }
-    .icon-button { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--border); border-radius: 11px; padding: 9px 12px; background: var(--surface); color: var(--text); font-size: 13px; font-weight: 650; }
-    .icon-button svg, .btn svg { width: 16px; height: 16px; flex: 0 0 auto; }
-    .icon-button:hover, .btn-subtle:hover { background: var(--surface-3); }
-    .intro { margin: -8px 0 24px; max-width: 810px; color: var(--muted); font-size: 14px; }
+    .actions, .options, .option-group, .section-heading,
+    .result-controls, .stats, .legend, .editor-heading { display: flex; align-items: center; }
+    .btn svg { width: 16px; height: 16px; flex: 0 0 auto; }
+    .btn-subtle:hover { background: var(--surface-3); }
     .workspace, .results { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; box-shadow: var(--shadow); overflow: hidden; }
     .editors { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 18px; padding: 23px; }
     .editor { min-width: 0; }
@@ -157,15 +121,15 @@
     .empty strong { font-size: 14px; color: var(--text); }
     .empty p { max-width: 480px; font-size: 12px; margin: 0; }
     .load-area { display: flex; justify-content: center; border-top: 1px solid var(--border); padding: 12px; }
-    .footer { margin: 16px 0 0; color: var(--muted); font-size: 11px; text-align: center; }
     .hidden { display: none !important; }
 
     /* Duplicate analysis */
-    .tool-tabs { display:flex; gap:7px; margin: 0 0 15px; flex-wrap:wrap; }
+    .tool-tabs { display:flex; gap:8px; margin: 0 0 18px; padding:0 0 17px; border-bottom:1px dashed var(--border); flex-wrap:wrap; }
     .tool-tab { padding:10px 17px; border:1px solid var(--border); border-radius:11px; background:var(--surface); color:var(--muted); font-weight:750; font-size:13px; }
     .tool-tab[aria-selected="true"] { color:var(--accent); background:var(--accent-soft); border-color:var(--focus); }
     .duplicate-settings { display:flex; flex-wrap:wrap; align-items:center; gap:12px 20px; border-top:1px dashed var(--border); padding-top:18px; margin-top:17px; }
     .duplicate-settings select { border:1px solid var(--border-strong); background:var(--surface-2); color:var(--text); border-radius:9px; padding:8px 10px; font-size:12px; }
+    .duplicate-select-group { display:inline-flex; align-items:center; gap:10px; min-width:0; }
     .duplicate-settings .toggle-label { white-space:normal; }
     .duplicate-explain { padding: 0 23px 17px; color:var(--muted); font-size:12px; }
     .duplicate-layout { display:grid; grid-template-columns:minmax(280px,.88fr) minmax(0,1.12fr); min-height:360px; }
@@ -184,6 +148,10 @@
     .duplicate-code-row { display:grid; grid-template-columns:55px minmax(0,1fr); border-bottom:1px solid var(--border); }
     .duplicate-code-row.hit { background:var(--yellow-bg); }
     .duplicate-code-row.active-hit { background:var(--green-bg); box-shadow:inset 3px 0 var(--green); }
+    .duplicate-code-row.word-hit .line-no { background:var(--yellow-bg); }
+    .duplicate-code-row.word-hit.word-active .line-no { background:var(--green-bg); }
+    .duplicate-word-mark { background:var(--yellow-border); color:var(--text); border-radius:3px; box-decoration-break:clone; -webkit-box-decoration-break:clone; }
+    .duplicate-word-mark.active { background:var(--green-strong); color:var(--text); font-weight:750; }
     .duplicate-code-row code { padding:5px 12px; min-width:0; white-space:pre-wrap; overflow-wrap:anywhere; font:12px/1.8 var(--code); }
     .duplicate-code-row .line-no { padding-top:5px; padding-bottom:5px; }
     .duplicate-preview-note { color:var(--muted); font-size:11px; padding:10px 16px; border-top:1px solid var(--border); }
@@ -199,15 +167,13 @@
     }
     @media (max-width: 670px) {
       .app { padding-top: 19px; }
-      .topbar { align-items: flex-start; }
-      .brand-mark { width: 42px; height: 42px; }
-      .privacy { display: none; }
-      .intro { margin-top: 0; }
       .editors { grid-template-columns: 1fr; }
       .editor textarea { min-height: 215px; height: 245px; }
       .editor-meta { display: inline; }
       .option-group { gap: 12px; }
       .options { gap: 13px; }
+      .tool-tabs { display:grid; grid-template-columns:1fr 1fr; }
+      .tool-tab { padding:10px 8px; }
       .result-controls { width: 100%; justify-content: space-between; }
       .diff-viewport { max-height: 570px; }
     }
@@ -218,31 +184,7 @@
 </head>
 <body>
   <div class="app">
-    <header class="topbar">
-      <div class="brand">
-        <div class="brand-mark" aria-hidden="true">
-          <svg viewBox="0 0 30 30" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M11 7 3.5 15 11 23M19 7 26.5 15 19 23M17 5 13 25"/>
-          </svg>
-        </div>
-        <div><span class="overline">Developer Utility</span><h1>HTML / Text Diff</h1></div>
-      </div>
-      <div class="head-right">
-        <span class="privacy">100 % lokal</span>
-        <button type="button" class="icon-button" id="themeButton" aria-label="Dark Mode aktivieren" title="Hell/Dunkel umschalten">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M20.2 14.8A8.7 8.7 0 0 1 9.2 3.8 8.8 8.8 0 1 0 20.2 14.8Z"/></svg>
-          <span id="themeText">Dark Mode</span>
-        </button>
-      </div>
-    </header>
-
-    <p class="intro">Vergleiche Texte und HTML-Quellcode zeilenweise oder wortbasiert. Auch kleine &Auml;nderungen innerhalb langer Codezeilen werden sichtbar. Deine Eingaben verlassen den Browser nicht.</p>
-
     <main>
-      <div class="tool-tabs" role="tablist" aria-label="Werkzeugauswahl">
-        <button class="tool-tab" role="tab" id="diffTab" aria-selected="true" aria-controls="diffResults">Versionen vergleichen</button>
-        <button class="tool-tab" role="tab" id="duplicateTab" aria-selected="false" aria-controls="duplicateResults">Duplikate erkennen</button>
-      </div>
       <section class="workspace" aria-label="Texteingaben und Optionen">
         <div class="editors">
           <div class="editor">
@@ -261,6 +203,10 @@
           </div>
         </div>
         <div class="toolbar">
+      <div class="tool-tabs" role="tablist" aria-label="Werkzeugauswahl">
+        <button class="tool-tab" role="tab" id="diffTab" aria-selected="true" aria-controls="diffResults">Versionen vergleichen</button>
+        <button class="tool-tab" role="tab" id="duplicateTab" aria-selected="false" aria-controls="duplicateResults">Duplikate erkennen</button>
+      </div>
           <div class="actions" id="diffActions">
             <button class="btn btn-primary" type="button" id="compareButton">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6-6 6 6 6M15 6l6 6-6 6M12 3v18"/></svg>
@@ -290,17 +236,27 @@
           </div>
           <div class="actions hidden" id="duplicateActions">
             <button class="btn btn-primary" type="button" id="scanDuplicates">Duplikate analysieren</button>
-            <button class="btn btn-subtle" type="button" id="duplicateSwapSource">Quelle wechseln</button>
           </div>
           <div class="duplicate-settings hidden" id="duplicateSettings">
-            <label class="control-label" for="duplicateSource">Textquelle</label>
-            <select id="duplicateSource"><option value="old">Original (Alt)</option><option value="new">Neue Version (Neu)</option></select>
-            <span class="control-label">Modus: Doppelte Blöcke</span>
+            <div class="duplicate-select-group">
+              <label class="control-label" for="duplicateSource">Textquelle</label>
+              <select id="duplicateSource"><option value="old">Original (Alt)</option><option value="new">Neue Version (Neu)</option></select>
+            </div>
+            <div class="duplicate-select-group">
+              <label class="control-label" for="duplicateMode">Modus</label>
+              <select id="duplicateMode" aria-label="Art der Duplikatsuche">
+                <option value="lines" selected>Doppelte Zeilen</option>
+                <option value="words">Doppelte W&ouml;rter</option>
+                <option value="blocks">Doppelte Bl&ouml;cke</option>
+              </select>
+            </div>
             <label class="toggle-label"><input type="checkbox" id="duplicateCase"> Groß-/Kleinschreibung beachten</label>
             <label class="toggle-label"><input type="checkbox" id="duplicateWhitespace" checked> Leerzeichen ignorieren</label>
             <label class="toggle-label"><input type="checkbox" id="duplicateEmpty" checked> Leere Zeilen ignorieren</label>
-            <label class="control-label" for="duplicateMin">Mindestens</label>
-            <select id="duplicateMin"><option value="2" selected>2 Vorkommen</option><option value="3">3 Vorkommen</option><option value="5">5 Vorkommen</option></select>
+            <div class="duplicate-select-group">
+              <label class="control-label" for="duplicateMin">Mindestens</label>
+              <select id="duplicateMin"><option value="2" selected>2 Vorkommen</option><option value="3">3 Vorkommen</option><option value="5">5 Vorkommen</option></select>
+            </div>
             <label class="toggle-label"><input type="checkbox" id="duplicateAuto" checked> Automatisch analysieren</label>
           </div>
           <p class="status" id="compareStatus" role="status" aria-live="polite">Bereit. Code wird nur lokal verarbeitet.</p>
@@ -346,17 +302,17 @@
 
       <section class="results hidden" id="duplicateResults" role="tabpanel" aria-labelledby="duplicateTab" aria-label="Duplikat-Analyse">
         <div class="results-top">
-          <div class="section-heading"><h2>Duplikat-Analyse</h2><span class="control-label" id="duplicateInfo">Blöcke innerhalb einer Textquelle</span></div>
+          <div class="section-heading"><h2>Duplikat-Analyse</h2><span class="control-label" id="duplicateInfo">Zeilen innerhalb einer Textquelle</span></div>
           <div class="stats" aria-live="polite">
             <span class="stat modified"><b id="duplicateGroupCount">0</b> Gruppen</span>
             <span class="stat"><b id="duplicateHitCount">0</b> Vorkommen</span>
             <span class="stat"><b id="duplicateExtraCount">0</b> zusätzliche Vorkommen</span>
           </div>
         </div>
-        <p class="duplicate-explain">Ein Block ist eine wiederholte zusammenhängende Folge von Quelltextzeilen (mindestens zwei), oder eine einzelne wiederholte vollständige HTML-Zeile. Zeilengruppen werden nach längsten Treffern bevorzugt. Leerzeilen trennen Blöcke. Kein HTML wird ausgeführt.</p>
+        <p class="duplicate-explain" id="duplicateExplain">Gleiche Zeilen werden auch dann erkannt, wenn sie an unterschiedlichen Stellen stehen. HTML wird dabei nur als Quelltext ausgewertet.</p>
         <div class="duplicate-layout">
           <div class="duplicate-groups">
-            <div class="duplicate-pane-heading"><span>Gefundene Blöcke</span><span id="duplicateTableCount">0 Treffer</span></div>
+            <div class="duplicate-pane-heading"><span id="duplicateGroupHeading">Gefundene Zeilen</span><span id="duplicateTableCount">0 Treffer</span></div>
             <div id="duplicateTableArea"><div class="duplicate-empty">Wähle eine Textquelle und starte die Analyse.</div></div>
           </div>
           <div class="duplicate-preview">
@@ -367,13 +323,12 @@
                 <button type="button" class="tiny-btn" id="duplicateNext" disabled>Nächster →</button>
               </div>
             </div>
-            <div class="duplicate-code" id="duplicateCode"><div class="duplicate-empty">Wähle einen Treffer in der Ergebnistabelle.</div></div>
+            <div class="duplicate-code" id="duplicateCode"><div class="duplicate-empty">W&auml;hle einen Treffer in der Ergebnistabelle.</div></div>
             <div class="duplicate-preview-note" id="duplicatePreviewNote">Fundstellen werden gelb markiert; die ausgewählte Fundstelle grün.</div>
           </div>
         </div>
       </section>
     </main>
-    <p class="footer">Offline nutzbar &middot; Kein Upload &middot; HTML wird ausschlie&szlig;lich als Text angezeigt</p>
   </div>
 
   <script>
@@ -1089,20 +1044,30 @@
           : 'Kopieren wurde vom Browser blockiert. Bitte die Seite in einem sicheren Browserkontext \u00f6ffnen.';
       }
 
-      function setTheme(theme) {
-        document.documentElement.dataset.theme = theme;
-        const dark = theme === 'dark';
-        $('themeText').textContent = dark ? 'Light Mode' : 'Dark Mode';
-        $('themeButton').setAttribute('aria-label', dark ? 'Light Mode aktivieren' : 'Dark Mode aktivieren');
-        try { localStorage.setItem('html-diff-theme', theme); } catch (_) { /* no storage required */ }
-      }
-
-
-      // Duplicate block analysis, entirely local and without HTML parsing/rendering.
+      // Local duplicate detection for lines, words and multi-line blocks.
+      // All source text is rendered with textContent or createTextNode.
       const dupState = { mode: 'diff', timer: null, cache: null, result: null, selected: -1, occurrence: 0 };
       const DUP_MAX_LINES = 64;
       const DUP_MAX_GROUPS = 150;
       const DUP_MAX_SEEDS = 30000;
+      const DUP_MAX_WORDS = 250000;
+      const DUP_MODE_TEXT = {
+        lines: {
+          name: 'Zeilen', singular: 'Zeile',
+          explain: 'Findet vollst\u00e4ndige Zeilen, die mehrfach vorkommen, auch an weit entfernten Stellen. Leerzeilen und Schreibweise werden entsprechend den Optionen behandelt. HTML wird nicht ausgef\u00fchrt.',
+          empty: 'Gleiche vollst\u00e4ndige Zeilen erscheinen hier mit ihren Zeilennummern.'
+        },
+        words: {
+          name: 'W\u00f6rter', singular: 'Wort',
+          explain: 'Findet mehrfach vorkommende W\u00f6rter mit genauer Zeichenposition, auch innerhalb von HTML-Tags und Attributen. Einzelne W\u00f6rter werden im Quelltext markiert. Die Optionen f\u00fcr Leerzeichen und leere Zeilen haben hier keinen Einfluss.',
+          empty: 'W\u00f6rter aus Text und HTML-Code werden einzeln verglichen.'
+        },
+        blocks: {
+          name: 'Bl\u00f6cke', singular: 'Block',
+          explain: 'Findet wiederholte zusammenh\u00e4ngende Folgen von mindestens zwei Quelltextzeilen sowie identische vollst\u00e4ndige einzeilige HTML-Elemente. L\u00e4ngere Bl\u00f6cke werden bevorzugt; Leerzeilen trennen die Bl\u00f6cke, wenn die entsprechende Option aktiviert ist.',
+          empty: 'Erkannt werden Folgen aus mindestens zwei gleichen Zeilen und vollst\u00e4ndige einzeilige HTML-Elemente.'
+        }
+      };
 
       function duplicateNormal(line) {
         let key = $('duplicateWhitespace').checked ? line.replace(/\s+/g, '') : line;
@@ -1110,15 +1075,82 @@
         return key;
       }
 
+      function finishDuplicateAnalysis(lines, groups, mode, truncated) {
+        // The first MAX_GROUPS matches remain available for navigation.
+        const overLimit = groups.length > DUP_MAX_GROUPS;
+        const selected = groups.slice(0, DUP_MAX_GROUPS);
+        for (const group of selected) {
+          if (!group.occurrences) {
+            group.occurrences = group.starts.map(line => ({ line, endLine: line + group.length - 1 }));
+          }
+        }
+        return {
+          mode, lines, groups: selected, truncated: Boolean(truncated || overLimit),
+          totalHits: selected.reduce((sum, group) => sum + group.occurrences.length, 0)
+        };
+      }
+
+      function lineAnalysis(text) {
+        const lines = getLines(text);
+        const entries = new Map();
+        const minHits = Number($('duplicateMin').value);
+        for (let i = 0; i < lines.length; i++) {
+          if ($('duplicateEmpty').checked && !lines[i].trim()) continue;
+          const key = duplicateNormal(lines[i]);
+          let group = entries.get(key);
+          if (!group) {
+            group = { length: 1, preview: lines[i], occurrences: [] };
+            entries.set(key, group);
+          }
+          group.occurrences.push({ line: i, endLine: i });
+        }
+        const groups = [...entries.values()]
+          .filter(group => group.occurrences.length >= minHits)
+          .sort((a, b) => b.occurrences.length - a.occurrences.length || a.occurrences[0].line - b.occurrences[0].line);
+        return finishDuplicateAnalysis(lines, groups, 'lines', false);
+      }
+
+      function wordAnalysis(text) {
+        const lines = getLines(text);
+        const entries = new Map();
+        const minHits = Number($('duplicateMin').value);
+        const wordPattern = /[\p{L}\p{N}_]+(?:['\u2019-][\p{L}\p{N}_]+)*/gu;
+        let checked = 0;
+        let truncated = false;
+        outer: for (let i = 0; i < lines.length; i++) {
+          for (const match of lines[i].matchAll(wordPattern)) {
+            if (checked >= DUP_MAX_WORDS) { truncated = true; break outer; }
+            checked++;
+            const original = match[0];
+            const key = $('duplicateCase').checked ? original : original.toLocaleLowerCase();
+            let group = entries.get(key);
+            if (!group) {
+              group = { length: 1, preview: original, occurrences: [] };
+              entries.set(key, group);
+            }
+            group.occurrences.push({
+              line: i, endLine: i,
+              startCol: match.index, endCol: match.index + original.length
+            });
+          }
+        }
+        const groups = [...entries.values()]
+          .filter(group => group.occurrences.length >= minHits)
+          .sort((a, b) => b.occurrences.length - a.occurrences.length ||
+            a.occurrences[0].line - b.occurrences[0].line ||
+            a.occurrences[0].startCol - b.occurrences[0].startCol);
+        return finishDuplicateAnalysis(lines, groups, 'words', truncated);
+      }
+
       function blockAnalysis(text) {
         const lines = getLines(text);
         const keys = lines.map(duplicateNormal);
         const skipEmpty = $('duplicateEmpty').checked;
         const minHits = Number($('duplicateMin').value);
-        const valid = keys.map((key) => key.length > 0 || !skipEmpty);
-        // Numeric IDs keep the pair-seed map small even when HTML lines are very long.
+        const valid = keys.map(key => key.length > 0 || !skipEmpty);
+        // Numeric IDs keep the pair-seed map small even when HTML lines are long.
         const ids = new Map();
-        const tokens = keys.map((key) => {
+        const tokens = keys.map(key => {
           if (!ids.has(key)) ids.set(key, ids.size + 1);
           return ids.get(key);
         });
@@ -1134,7 +1166,7 @@
         const candidates = [];
         for (const positions of seedMap.values()) {
           if (positions.length < minHits) continue;
-          let limit = Math.min(DUP_MAX_LINES, ...positions.map(i => {
+          const limit = Math.min(DUP_MAX_LINES, ...positions.map(i => {
             let j = i;
             while (j < lines.length && valid[j] && j - i < DUP_MAX_LINES) j++;
             return j - i;
@@ -1144,7 +1176,7 @@
           while (length < limit && positions.every(i => tokens[i + length] === tokens[positions[0] + length])) length++;
           candidates.push({ positions, length });
         }
-        // A complete one-line HTML element can also count as a repeated block.
+        // Treat complete repeated one-line HTML elements as blocks as well.
         const singles = new Map();
         for (let i = 0; i < lines.length; i++) {
           if (!valid[i]) continue;
@@ -1162,7 +1194,6 @@
         const groups = [];
         for (const candidate of candidates) {
           if (groups.length >= DUP_MAX_GROUPS) break;
-          // Ensure occurrences of the same group do not overlap each other.
           const accepted = [];
           let previousEnd = -1;
           for (const start of candidate.positions) {
@@ -1175,24 +1206,40 @@
           }
           if (accepted.length < minHits) continue;
           for (const start of accepted) occupied.fill(1, start, start + candidate.length);
-          groups.push({ id: groups.length + 1, starts: accepted, length: candidate.length, preview: lines.slice(accepted[0], accepted[0] + candidate.length).join('\n') });
+          groups.push({
+            starts: accepted, length: candidate.length,
+            preview: lines.slice(accepted[0], accepted[0] + candidate.length).join('\n')
+          });
         }
-        groups.sort((a,b) => a.starts[0] - b.starts[0]);
-        return { lines, groups, truncated: seeds >= DUP_MAX_SEEDS, totalHits: groups.reduce((a,g)=>a+g.starts.length,0) };
+        groups.sort((a, b) => a.starts[0] - b.starts[0]);
+        return finishDuplicateAnalysis(lines, groups, 'blocks', seeds >= DUP_MAX_SEEDS);
       }
 
       function duplicateConfigKey() {
-        return [ $('duplicateSource').value, $('duplicateCase').checked, $('duplicateWhitespace').checked,
-          $('duplicateEmpty').checked, $('duplicateMin').value ].join('|');
+        return [ $('duplicateMode').value, $('duplicateSource').value, $('duplicateCase').checked,
+          $('duplicateWhitespace').checked, $('duplicateEmpty').checked, $('duplicateMin').value ].join('|');
+      }
+
+      function updateDuplicateModeUI() {
+        const mode = $('duplicateMode').value;
+        const details = DUP_MODE_TEXT[mode];
+        $('duplicateExplain').textContent = details.explain;
+        $('duplicateGroupHeading').textContent = 'Gefundene ' + details.name;
+        // Neither checkbox changes individual word tokens; preserve their settings for other modes.
+        $('duplicateWhitespace').disabled = mode === 'words';
+        $('duplicateEmpty').disabled = mode === 'words';
       }
 
       function analyzeDuplicates() {
         clearTimeout(dupState.timer);
         dupState.timer = null;
+        updateDuplicateModeUI();
+        const mode = $('duplicateMode').value;
         const text = $('duplicateSource').value === 'old' ? oldInput.value : newInput.value;
         const config = duplicateConfigKey();
         if (!dupState.cache || dupState.cache.text !== text || dupState.cache.config !== config) {
-          dupState.result = blockAnalysis(text);
+          dupState.result = mode === 'lines' ? lineAnalysis(text)
+            : mode === 'words' ? wordAnalysis(text) : blockAnalysis(text);
           dupState.cache = { text, config, result: dupState.result };
         } else dupState.result = dupState.cache.result;
         dupState.selected = dupState.result.groups.length ? 0 : -1;
@@ -1203,24 +1250,28 @@
       function renderDuplicateResults() {
         const result = dupState.result;
         if (!result) return;
+        const mode = result.mode;
         $('duplicateGroupCount').textContent = numberFormat.format(result.groups.length);
         $('duplicateHitCount').textContent = numberFormat.format(result.totalHits);
         $('duplicateExtraCount').textContent = numberFormat.format(result.totalHits - result.groups.length);
         $('duplicateTableCount').textContent = numberFormat.format(result.groups.length) + ' Gruppen';
-        $('duplicateInfo').textContent = $('duplicateSource').value === 'old' ? 'Quelle: Original (Alt)' : 'Quelle: Neue Version (Neu)';
+        $('duplicateInfo').textContent = DUP_MODE_TEXT[mode].name + ' \u00b7 Quelle: ' +
+          ($('duplicateSource').value === 'old' ? 'Original (Alt)' : 'Neue Version (Neu)');
         const tableArea = $('duplicateTableArea');
         tableArea.replaceChildren();
         if (!result.groups.length) {
           const empty = element('div', 'duplicate-empty');
-          empty.append(element('strong', '', 'Keine doppelten Blöcke gefunden.'),
-            element('span', '', 'Erkannt werden identische Folgen ab zwei Zeilen sowie vollständige einzeilige HTML-Elemente.'));
+          empty.append(element('strong', '', 'Keine doppelten ' + DUP_MODE_TEXT[mode].name + ' gefunden.'),
+            element('span', '', DUP_MODE_TEXT[mode].empty));
           tableArea.appendChild(empty);
         } else {
           const table = element('table', 'duplicate-table');
           const head = document.createElement('thead');
           const trHead = document.createElement('tr');
-          for (const caption of ['Block / Vorschau', 'Anzahl', 'Fundstellen']) {
-            const th = document.createElement('th'); th.textContent = caption; trHead.appendChild(th);
+          for (const caption of ['Inhalt / Vorschau', 'Anzahl', 'Fundstellen']) {
+            const th = document.createElement('th');
+            th.textContent = caption;
+            trHead.appendChild(th);
           }
           head.appendChild(trHead);
           const body = document.createElement('tbody');
@@ -1228,22 +1279,30 @@
             const tr = document.createElement('tr');
             if (index === dupState.selected) tr.className = 'selected';
             const first = document.createElement('td');
-            first.append(element('strong', '', group.length + (group.length === 1 ? ' Zeile' : ' Zeilen')),
-              element('code', 'duplicate-snippet', group.preview.length > 210 ? group.preview.slice(0, 210) + '…' : group.preview));
-            const count = document.createElement('td'); count.textContent = String(group.starts.length) + '×';
+            const label = mode === 'words' ? 'Wort' : mode === 'lines' ? 'Zeile' :
+              group.length + (group.length === 1 ? ' Zeile' : ' Zeilen');
+            first.append(element('strong', '', label),
+              element('code', 'duplicate-snippet', group.preview.length > 210 ? group.preview.slice(0, 210) + '\u2026' : group.preview));
+            const count = document.createElement('td');
+            count.textContent = String(group.occurrences.length) + '\u00d7';
             const location = document.createElement('td');
-            const jump = element('button', 'tiny-btn', 'Zeilen ' + group.starts.map(n => n + 1).slice(0, 3).join(', ') + (group.starts.length > 3 ? ' …' : ''));
-            jump.type = 'button'; jump.setAttribute('aria-label', 'Block ' + (index+1) + ' anzeigen');
+            const summary = group.occurrences.slice(0, 3).map(occ =>
+              String(occ.line + 1) + (mode === 'words' ? ':' + (occ.startCol + 1) : '')).join(', ');
+            const jump = element('button', 'tiny-btn', (mode === 'words' ? 'Zeile:Zeichen ' : 'Zeilen ') +
+              summary + (group.occurrences.length > 3 ? ' \u2026' : ''));
+            jump.type = 'button';
+            jump.setAttribute('aria-label', DUP_MODE_TEXT[mode].singular + ' ' + (index + 1) + ' anzeigen');
             jump.addEventListener('click', () => selectDuplicateGroup(index));
             location.appendChild(jump);
             tr.append(first, count, location);
             body.appendChild(tr);
           });
-          table.append(head, body); tableArea.appendChild(table);
+          table.append(head, body);
+          tableArea.appendChild(table);
         }
         renderDuplicatePreview();
         $('compareStatus').textContent = result.truncated
-          ? 'Duplikat-Analyse abgeschlossen. Bei sehr großen Dateien wurde die Suche auf die ersten 30.000 möglichen Starts begrenzt.'
+          ? 'Duplikat-Analyse abgeschlossen. Aus Leistungsgr\u00fcnden wurden nur die ersten Treffer bzw. maximal 150 Gruppen ber\u00fccksichtigt.'
           : 'Duplikat-Analyse abgeschlossen. Alles wurde lokal verarbeitet.';
       }
 
@@ -1251,7 +1310,7 @@
         dupState.selected = index;
         dupState.occurrence = 0;
         const rows = $('duplicateTableArea').querySelectorAll('tbody tr');
-        rows.forEach((row,i) => row.classList.toggle('selected', i === index));
+        rows.forEach((row, i) => row.classList.toggle('selected', i === index));
         renderDuplicatePreview();
       }
 
@@ -1260,27 +1319,64 @@
         area.replaceChildren();
         const result = dupState.result;
         if (!result || dupState.selected < 0) {
-          area.appendChild(element('div', 'duplicate-empty', 'Keine Fundstelle ausgewählt.'));
+          area.appendChild(element('div', 'duplicate-empty', 'Keine Fundstelle ausgew\u00e4hlt.'));
           $('duplicatePrev').disabled = true;
           $('duplicateNext').disabled = true;
           $('duplicatePreviewHeading').textContent = 'Quelltext-Vorschau';
-          $('duplicatePreviewNote').textContent = 'Gefundene Blöcke erscheinen mit ihren Zeilennummern.';
+          $('duplicatePreviewNote').textContent = 'Gefundene ' + (result ? DUP_MODE_TEXT[result.mode].name : 'Duplikate') +
+            ' erscheinen mit ihren Zeilennummern.';
           return;
         }
         const group = result.groups[dupState.selected];
-        const start = group.starts[dupState.occurrence];
+        const selected = group.occurrences[dupState.occurrence];
+        const firstLine = selected.line;
+        const lastLine = selected.endLine;
         $('duplicatePrev').disabled = dupState.occurrence === 0;
-        $('duplicateNext').disabled = dupState.occurrence === group.starts.length - 1;
-        $('duplicatePreviewHeading').textContent = 'Fundstelle ' + (dupState.occurrence + 1) + ' von ' + group.starts.length;
-        $('duplicatePreviewNote').textContent = 'Zeilen ' + (start + 1) + '–' + (start + group.length) + ' · ' + group.length + ' Zeilen pro Block';
-        const from = Math.max(0, start - 9);
-        const to = Math.min(result.lines.length, start + group.length + 9);
+        $('duplicateNext').disabled = dupState.occurrence === group.occurrences.length - 1;
+        $('duplicatePreviewHeading').textContent = 'Fundstelle ' + (dupState.occurrence + 1) + ' von ' + group.occurrences.length;
+        $('duplicatePreviewNote').textContent = result.mode === 'words'
+          ? 'Zeile ' + (firstLine + 1) + ', Zeichen ' + (selected.startCol + 1) + '\u2013' + selected.endCol +
+            ' \u00b7 ausgew\u00e4hltes Wort gr\u00fcn, weitere Treffer gelb'
+          : result.mode === 'lines'
+            ? 'Zeile ' + (firstLine + 1) + ' \u00b7 gesamte doppelte Zeile markiert'
+            : 'Zeilen ' + (firstLine + 1) + '\u2013' + (lastLine + 1) +
+              ' \u00b7 ' + group.length + ' Zeilen pro Block';
+        const from = Math.max(0, firstLine - 9);
+        const to = Math.min(result.lines.length, lastLine + 10);
+        const marksByLine = new Map();
+        for (let index = 0; index < group.occurrences.length; index++) {
+          const hit = group.occurrences[index];
+          if (hit.endLine < from || hit.line >= to) continue;
+          for (let rowNumber = Math.max(hit.line, from); rowNumber <= Math.min(hit.endLine, to - 1); rowNumber++) {
+            if (!marksByLine.has(rowNumber)) marksByLine.set(rowNumber, []);
+            marksByLine.get(rowNumber).push({ hit, active: index === dupState.occurrence });
+          }
+        }
         const fragment = document.createDocumentFragment();
         for (let i = from; i < to; i++) {
           const row = element('div', 'duplicate-code-row');
-          if (i >= start && i < start + group.length) row.classList.add('active-hit');
-          else if (group.starts.some(n => i >= n && i < n + group.length)) row.classList.add('hit');
-          row.append(element('span', 'line-no', String(i+1)), element('code', '', result.lines[i] || ' '));
+          const code = element('code', '');
+          const matches = marksByLine.get(i) || [];
+          if (result.mode === 'words') {
+            if (matches.length) row.classList.add('word-hit');
+            if (matches.some(match => match.active)) row.classList.add('word-active');
+            let cursor = 0;
+            for (const match of matches.sort((a, b) => a.hit.startCol - b.hit.startCol)) {
+              const start = match.hit.startCol;
+              const end = match.hit.endCol;
+              if (start < cursor) continue;
+              code.appendChild(document.createTextNode(result.lines[i].slice(cursor, start)));
+              code.appendChild(element('span', 'duplicate-word-mark' + (match.active ? ' active' : ''),
+                result.lines[i].slice(start, end)));
+              cursor = end;
+            }
+            code.appendChild(document.createTextNode(result.lines[i].slice(cursor)));
+          } else {
+            if (matches.some(match => match.active)) row.classList.add('active-hit');
+            else if (matches.length) row.classList.add('hit');
+            code.textContent = result.lines[i] || ' ';
+          }
+          row.append(element('span', 'line-no', String(i + 1)), code);
           fragment.appendChild(row);
         }
         area.appendChild(fragment);
@@ -1307,17 +1403,13 @@
       $('diffTab').addEventListener('click', () => setToolMode('diff'));
       $('duplicateTab').addEventListener('click', () => setToolMode('duplicate'));
       $('scanDuplicates').addEventListener('click', analyzeDuplicates);
-      $('duplicateSwapSource').addEventListener('click', () => {
-        $('duplicateSource').value = $('duplicateSource').value === 'old' ? 'new' : 'old';
-        analyzeDuplicates();
-      });
-      for (const id of ['duplicateSource','duplicateCase','duplicateWhitespace','duplicateEmpty','duplicateMin'])
+      for (const id of ['duplicateSource','duplicateMode','duplicateCase','duplicateWhitespace','duplicateEmpty','duplicateMin'])
         $(id).addEventListener('change', analyzeDuplicates);
       $('duplicateAuto').addEventListener('change', scheduleDuplicateAnalysis);
       $('duplicatePrev').addEventListener('click', () => { if (dupState.occurrence > 0) { dupState.occurrence--; renderDuplicatePreview(); } });
       $('duplicateNext').addEventListener('click', () => {
         const group = dupState.result && dupState.result.groups[dupState.selected];
-        if (group && dupState.occurrence < group.starts.length - 1) { dupState.occurrence++; renderDuplicatePreview(); }
+        if (group && dupState.occurrence < group.occurrences.length - 1) { dupState.occurrence++; renderDuplicatePreview(); }
       });
       oldInput.addEventListener('input', scheduleDuplicateAnalysis);
       newInput.addEventListener('input', scheduleDuplicateAnalysis);
@@ -1363,15 +1455,9 @@
         renderResult();
         diffViewport.scrollTop = previous;
       });
-      $('themeButton').addEventListener('click', () => setTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'));
-
-      let initialTheme = 'light';
-      try {
-        initialTheme = localStorage.getItem('html-diff-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-      } catch (_) { /* file:// privacy restrictions */ }
-      setTheme(initialTheme);
       updateMetadata();
       updatePressed();
+      updateDuplicateModeUI();
     })();
   </script>
 </body>
