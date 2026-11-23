@@ -65,6 +65,24 @@
     .editor textarea { display: block; width: 100%; min-height: 272px; height: clamp(272px, 29vw, 398px); resize: vertical; background: var(--surface-2); color: var(--text); border: 1px solid var(--border-strong); border-radius: 12px; padding: 17px 18px; font-family: var(--code); font-size: 12.5px; line-height: 1.85; tab-size: 2; white-space: pre; outline: none; transition: border-color .18s, box-shadow .18s; }
     .editor textarea::placeholder { color: var(--muted); opacity: .72; }
     .editor textarea:focus { border-color: var(--focus); box-shadow: 0 0 0 3px var(--accent-soft); }
+    /* File import – the icon is inside each editor, no separate toolbar. */
+    .editor-input-shell { position: relative; isolation: isolate; }
+    .editor-input-shell textarea { padding-bottom: 60px; }
+    .upload-file-button { position: absolute; z-index: 2; bottom: 20px; right: 21px; width: 39px; height: 39px; padding: 0; display: grid; place-items: center; border: 1px solid var(--border-strong); border-radius: 10px; background: var(--surface-3); color: var(--text); box-shadow: 0 6px 18px rgba(0,0,0,.25); opacity: 0; transform: translateY(5px); pointer-events: none; transition: opacity .16s ease, transform .16s ease, background .16s ease; }
+    .upload-file-button svg { width: 19px; height: 19px; }
+    .upload-file-button:hover { background: var(--accent-soft); color: var(--accent-hover); }
+    .editor-input-shell:hover .upload-file-button,
+    .editor-input-shell:focus-within .upload-file-button,
+    .upload-file-button:focus-visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
+    .upload-file-button:disabled { cursor: progress; opacity: .65; }
+    .file-drop-overlay { position: absolute; z-index: 3; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 20px; background: rgba(19,30,48,.94); border: 2px dashed var(--accent); border-radius: 12px; text-align: center; opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .12s ease, visibility .12s ease; }
+    .file-drop-overlay svg { width: 31px; height: 31px; color: var(--accent); }
+    .file-drop-overlay strong { font-size: 14px; font-weight: 750; color: var(--text); }
+    .file-drop-overlay span { font-size: 12px; color: var(--muted); }
+    body.file-dragging .file-drop-overlay { visibility: visible; opacity: 1; }
+    body.file-dragging .editor-input-shell textarea { border-color: var(--accent); }
+    body.file-dragging .editor-input-shell:hover .file-drop-overlay { background: rgba(37,51,82,.97); border-color: var(--accent-hover); }
+    @media (hover: none) { .upload-file-button { opacity: 1; transform: none; pointer-events: auto; } }
     .toolbar { padding: 17px 23px 21px; border-top: 1px solid var(--border); }
     .actions { flex-wrap: wrap; gap: 9px; }
     .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 39px; padding: 9px 14px; border: 1px solid transparent; border-radius: 10px; font-size: 13px; font-weight: 730; transition: background .15s, border-color .15s; }
@@ -204,14 +222,34 @@
               <label class="field-label original" for="oldText">Original (Alt)</label>
               <span class="editor-meta" id="oldMeta">0 Zeilen</span>
             </div>
-            <textarea id="oldText" wrap="off" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" placeholder="Alten Text oder HTML-Code einf&uuml;gen ..." aria-label="Originaltext"></textarea>
+            <div class="editor-input-shell" id="oldFileZone">
+              <textarea id="oldText" wrap="off" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" placeholder="Alten Text oder HTML-Code einf&uuml;gen ..." aria-label="Originaltext"></textarea>
+              <button class="upload-file-button" id="oldUploadButton" type="button" title="Datei für Original (Alt) öffnen" aria-label="Datei in Original (Alt) laden">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V3m0 0L7 8m5-5 5 5"/><path d="M4 15v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/></svg>
+              </button>
+              <input type="file" id="oldFileInput" hidden tabindex="-1" aria-label="Datei für Original (Alt) auswählen">
+              <div class="file-drop-overlay" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V3m0 0L7 8m5-5 5 5"/><path d="M4 15v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/></svg>
+                <strong>Datei für Original (Alt) ablegen</strong><span>HTML, Text oder Code · lokal im Browser</span>
+              </div>
+            </div>
           </div>
           <div class="editor">
             <div class="editor-heading">
               <label class="field-label revised" for="newText">Neue Version (Neu)</label>
               <span class="editor-meta" id="newMeta">0 Zeilen</span>
             </div>
-            <textarea id="newText" wrap="off" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" placeholder="Neuen Text oder HTML-Code einf&uuml;gen ..." aria-label="Neuer Text"></textarea>
+            <div class="editor-input-shell" id="newFileZone">
+              <textarea id="newText" wrap="off" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" placeholder="Neuen Text oder HTML-Code einf&uuml;gen ..." aria-label="Neuer Text"></textarea>
+              <button class="upload-file-button" id="newUploadButton" type="button" title="Datei für Neue Version (Neu) öffnen" aria-label="Datei in Neue Version (Neu) laden">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V3m0 0L7 8m5-5 5 5"/><path d="M4 15v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/></svg>
+              </button>
+              <input type="file" id="newFileInput" hidden tabindex="-1" aria-label="Datei für Neue Version (Neu) auswählen">
+              <div class="file-drop-overlay" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V3m0 0L7 8m5-5 5 5"/><path d="M4 15v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/></svg>
+                <strong>Datei für Neue Version (Neu) ablegen</strong><span>HTML, Text oder Code · lokal im Browser</span>
+              </div>
+            </div>
           </div>
         </div>
         <div class="toolbar">
@@ -1429,8 +1467,138 @@
       oldInput.addEventListener('input', scheduleDuplicateAnalysis);
       newInput.addEventListener('input', scheduleDuplicateAnalysis);
 
+      // File import uses the local File API; file contents never leave the browser.
+      const MAX_IMPORT_BYTES = 15 * 1024 * 1024;
+      const uploadEditors = [
+        { zone: $('oldFileZone'), button: $('oldUploadButton'), picker: $('oldFileInput'), input: oldInput, label: 'Original (Alt)', seq: 0 },
+        { zone: $('newFileZone'), button: $('newUploadButton'), picker: $('newFileInput'), input: newInput, label: 'Neue Version (Neu)', seq: 0 }
+      ];
+      const fileStatus = (message) => { $('compareStatus').textContent = message; };
+
+      function decodeLocalText(buffer, mimeType) {
+        const bytes = new Uint8Array(buffer);
+        const prefix = bytes.subarray(0, Math.min(8192, bytes.length));
+        const utf16le = bytes.length >= 2 && bytes[0] === 255 && bytes[1] === 254;
+        const utf16be = bytes.length >= 2 && bytes[0] === 254 && bytes[1] === 255;
+        if (/^(?:image\/(?!svg\+xml)|audio\/|video\/|application\/(?:pdf|zip|gzip|x-zip-compressed|x-rar-compressed))/.test(mimeType || '')) {
+          throw new Error('Diese Datei ist kein Text- oder HTML-Dokument.');
+        }
+        if (!utf16le && !utf16be) {
+          if (prefix.some(byte => byte === 0)) throw new Error('Binärdateien können nicht als Text importiert werden.');
+          const badControls = prefix.filter(byte => (byte < 9 || (byte > 13 && byte < 32)) && byte !== 0).length;
+          if (badControls > Math.max(1, Math.floor(prefix.length * .01))) {
+            throw new Error('Die Datei scheint keine lesbare Textdatei zu sein.');
+          }
+        }
+        const encoding = utf16le ? 'utf-16le' : utf16be ? 'utf-16be' : 'utf-8';
+        let text;
+        try {
+          text = new TextDecoder(encoding, { fatal: true }).decode(bytes);
+        } catch (error) {
+          if (utf16le || utf16be) throw new Error('Die UTF-16-Datei kann nicht gelesen werden.');
+          text = new TextDecoder('windows-1252').decode(bytes);
+        }
+        // Do not import text containing unexpected embedded binary control characters.
+        const sample = text.slice(0, 8192);
+        const controls = (sample.match(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g) || []).length;
+        if (controls > Math.max(1, Math.floor(sample.length * .01))) {
+          throw new Error('Die Datei enthält Binärdaten statt lesbaren Texts.');
+        }
+        return text;
+      }
+
+      async function importIntoEditor(file, editor) {
+        if (!file) return;
+        const ticket = ++editor.seq;
+        editor.button.disabled = false;
+        editor.zone.removeAttribute('aria-busy');
+        if (file.size > MAX_IMPORT_BYTES) {
+          fileStatus('Datei „' + file.name + '“ ist zu groß (maximal 15 MB).');
+          return;
+        }
+        editor.button.disabled = true;
+        editor.zone.setAttribute('aria-busy', 'true');
+        fileStatus('Lese „' + file.name + '“ für ' + editor.label + ' ...');
+        try {
+          const contents = decodeLocalText(await file.arrayBuffer(), file.type);
+          if (ticket !== editor.seq) return;
+          editor.input.value = contents;
+          editor.input.dispatchEvent(new Event('input', { bubbles: true }));
+          updateMetadata();
+          editor.input.focus({ preventScroll: true });
+          fileStatus('„' + file.name + '“ wurde lokal in ' + editor.label + ' geladen.');
+        } catch (error) {
+          if (ticket === editor.seq) fileStatus('Import fehlgeschlagen: ' + (error.message || 'Datei konnte nicht gelesen werden.'));
+        } finally {
+          if (ticket === editor.seq) {
+            editor.button.disabled = false;
+            editor.zone.removeAttribute('aria-busy');
+          }
+        }
+      }
+
+      function hasDraggedFiles(event) {
+        const transfer = event.dataTransfer;
+        return !!transfer && (Array.from(transfer.types || []).includes('Files') || (transfer.files && transfer.files.length > 0));
+      }
+
+      let dragDepth = 0;
+      function closeFileDrag() {
+        dragDepth = 0;
+        document.body.classList.remove('file-dragging');
+      }
+
+      // The two input areas become drop targets as soon as a file enters the window.
+      window.addEventListener('dragenter', (event) => {
+        if (!hasDraggedFiles(event)) return;
+        dragDepth++;
+        document.body.classList.add('file-dragging');
+      });
+      window.addEventListener('dragleave', (event) => {
+        if (!document.body.classList.contains('file-dragging')) return;
+        if (--dragDepth <= 0) closeFileDrag();
+      });
+      window.addEventListener('dragover', (event) => {
+        if (!hasDraggedFiles(event)) return;
+        event.preventDefault();
+        const withinEditor = event.target instanceof Element && event.target.closest('.editor-input-shell');
+        event.dataTransfer.dropEffect = withinEditor ? 'copy' : 'none';
+      });
+      window.addEventListener('drop', (event) => {
+        if (!hasDraggedFiles(event) && !document.body.classList.contains('file-dragging')) return;
+        event.preventDefault();  // Prevent navigating away when dropped outside an editor.
+        closeFileDrag();
+        if (!(event.target instanceof Element && event.target.closest('.editor-input-shell'))) {
+          fileStatus('Datei bitte direkt auf Original (Alt) oder Neue Version (Neu) ablegen.');
+        }
+      });
+      window.addEventListener('blur', closeFileDrag);
+      window.addEventListener('keydown', (event) => { if (event.key === 'Escape') closeFileDrag(); });
+
+      for (const editor of uploadEditors) {
+        editor.button.addEventListener('click', () => editor.picker.click());
+        editor.picker.addEventListener('change', () => {
+          const file = editor.picker.files && editor.picker.files[0];
+          editor.picker.value = '';  // The same file may be selected again later.
+          if (file) importIntoEditor(file, editor);
+        });
+        editor.zone.addEventListener('drop', (event) => {
+          if (!hasDraggedFiles(event)) return;
+          event.preventDefault();
+          event.stopPropagation();
+          closeFileDrag();
+          const files = event.dataTransfer.files;
+          if (files.length !== 1) {
+            fileStatus('Bitte genau eine Datei pro Eingabefeld ablegen.');
+            return;
+          }
+          importIntoEditor(files[0], editor);
+        });
+      }
+
       $('compareButton').addEventListener('click', runComparison);
       $('resetButton').addEventListener('click', () => {
+        for (const editor of uploadEditors) { editor.seq++; editor.button.disabled = false; editor.zone.removeAttribute('aria-busy'); }
         if (state.timer) clearTimeout(state.timer);
         state.timer = null;
         oldInput.value = '';
@@ -1446,6 +1614,7 @@
         if (dupState.mode === 'duplicate') analyzeDuplicates();
       });
       $('swapButton').addEventListener('click', () => {
+        for (const editor of uploadEditors) { editor.seq++; editor.button.disabled = false; editor.zone.removeAttribute('aria-busy'); }
         const temporary = oldInput.value;
         oldInput.value = newInput.value;
         newInput.value = temporary;
