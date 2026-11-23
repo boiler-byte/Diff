@@ -4,6 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#0e1420">
+  <meta name="description" content="HTML- und Textversionen vergleichen und doppelte Zeilen, Wörter oder Blöcke erkennen – lokal und offline.">
+  <meta name="application-name" content="HTML Diff">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="HTML Diff">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" type="image/svg+xml" href="./icons/favicon.svg">
+  <link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon.png">
   <title>HTML / Text Diff - Lokaler Vergleich</title>
   <style>
     :root {
@@ -71,6 +80,9 @@
     .segmented button { padding: 5px 12px; min-height: 29px; background: transparent; border: 0; border-radius: 7px; font-size: 12px; font-weight: 700; color: var(--muted); }
     .segmented button[aria-pressed="true"] { background: var(--surface); color: var(--text); box-shadow: 0 1px 5px rgba(0,0,0,.09); }
     .status { color: var(--muted); margin: 13px 0 0; font-size: 12px; min-height: 18px; }
+    .status-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    .status-row .status { flex: 1 1 220px; }
+    .pwa-install { margin-top: 10px; font-size: 12px; min-height: 34px; }
     .results { margin-top: 24px; }
     .results-top { padding: 21px 23px 16px; border-bottom: 1px solid var(--border); }
     .section-heading { gap: 12px; justify-content: space-between; flex-wrap: wrap; }
@@ -259,7 +271,10 @@
             </div>
             <label class="toggle-label"><input type="checkbox" id="duplicateAuto" checked> Automatisch analysieren</label>
           </div>
-          <p class="status" id="compareStatus" role="status" aria-live="polite">Bereit. Code wird nur lokal verarbeitet.</p>
+          <div class="status-row">
+            <p class="status" id="compareStatus" role="status" aria-live="polite">Bereit. Code wird nur lokal verarbeitet.</p>
+            <button class="btn btn-subtle pwa-install hidden" type="button" id="installAppButton">App installieren</button>
+          </div>
         </div>
       </section>
 
@@ -1455,6 +1470,41 @@
         renderResult();
         diffViewport.scrollTop = previous;
       });
+      // Installierbare PWA: Der Button erscheint nur, wenn der Browser
+      // einen Installationsdialog anbietet. Kein Inhalt wird übertragen.
+      const installButton = $('installAppButton');
+      let pendingInstallPrompt = null;
+      window.addEventListener('beforeinstallprompt', (event) => {
+        event.preventDefault();
+        pendingInstallPrompt = event;
+        installButton.classList.remove('hidden');
+      });
+      installButton.addEventListener('click', async () => {
+        if (!pendingInstallPrompt) return;
+        const prompt = pendingInstallPrompt;
+        pendingInstallPrompt = null;
+        installButton.classList.add('hidden');
+        try {
+          await prompt.prompt();
+          await prompt.userChoice;
+        } catch (error) {
+          console.warn('Installation wurde nicht gestartet:', error);
+        }
+      });
+      window.addEventListener('appinstalled', () => {
+        pendingInstallPrompt = null;
+        installButton.classList.add('hidden');
+      });
+
+      // Der Service Worker speichert ausschließlich die statischen App-Dateien.
+      // Textarea-Inhalte werden weder gesendet noch in CacheStorage abgelegt.
+      if ('serviceWorker' in navigator && window.isSecureContext) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./sw.js', { scope: './' })
+            .catch((error) => console.warn('Offline-Funktion nicht verfügbar:', error));
+        });
+      }
+
       updateMetadata();
       updatePressed();
       updateDuplicateModeUI();
