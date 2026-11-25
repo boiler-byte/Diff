@@ -2,7 +2,7 @@
   "id": "./index.html",
   "name": "HTML Diff – Text- & Codevergleich",
   "short_name": "HTML Diff",
-  "description": "HTML und Text vergleichen, doppelte Zeilen, Wörter und Blöcke finden. Lokal, privat und offline.",
+  "description": "HTML und Text vergleichen, Textstatistiken gegenüberstellen und Duplikate finden. Lokal, privat und offline.",
   "lang": "de",
   "start_url": "./index.html",
   "scope": "./",

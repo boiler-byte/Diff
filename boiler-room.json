@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "version": 1,
+  "version": 2,
   "created": null,
   "updated": "2026-11-25",
   "tags": [
@@ -11,7 +11,11 @@
     "duplikatsuche",
     "zeilenvergleich",
     "wortvergleich",
-    "blockvergleich"
+    "blockvergleich",
+    "textanalyse",
+    "lesbarkeit",
+    "wortschatz",
+    "wortwolke"
   ],
   "offline": {
     "mode": "full",
@@ -19,6 +23,8 @@
   },
   "files": [
     "index.html",
+    "text-analysis.js",
+    "wordcloud.js",
     "manifest.webmanifest",
     "sw.js",
     "icons/favicon.svg",

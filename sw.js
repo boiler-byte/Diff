@@ -1,8 +1,10 @@
 /* HTML Diff – offline App-Shell. Keine Eingabedaten werden gespeichert. */
 'use strict';
-const CACHE_NAME = 'html-diff-pwa-v1';
+const CACHE_NAME = 'html-diff-pwa-v2';
 const APP_FILES = [
   './index.html',
+  './text-analysis.js',
+  './wordcloud.js',
   './manifest.webmanifest',
   './icons/favicon.svg',
   './icons/icon-192.png',
@@ -58,7 +60,7 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // Ausschließlich Manifest, Icons und App-HTML cachen.
+  // Ausschließlich Manifest, Icons, App-HTML und lokale Skripte cachen.
   if (!APP_ASSETS.has(url.href)) return;
   event.respondWith((async () => {
     const cached = await caches.match(request);

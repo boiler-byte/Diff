@@ -1,79 +1,111 @@
-# HTML Diff – PWA
+# HTML Diff – PWA · Version 2
 
-Die App vergleicht HTML und Text und erkennt doppelte Zeilen, Wörter und Blöcke.
-Alle Inhalte werden ausschließlich im Browser verarbeitet. Keine Bibliotheken, APIs oder Backends.
+HTML- und Textversionen vergleichen, Textanalyse gegenüberstellen und doppelte
+Zeilen, Wörter oder Blöcke finden. Alle Eingaben werden ausschließlich im
+Browser verarbeitet. Es gibt keine APIs, Backends oder externen Bibliotheken.
+
+## Neuerungen in Version 2
+
+Unter **Versionen vergleichen → Vergleichsergebnis** gibt es neben Side-by-Side
+und Inline-Diff die neue Ansicht **Analyse**. Sie verwendet dieselben Eingaben
+und denselben Vergleichsstand wie die bisherigen Diff-Ansichten. Bei aktivem
+„Automatisch vergleichen“ wird der Vergleich nach Eingabe aktualisiert; andernfalls
+über „Vergleichen“. Seiten tauschen, Zurücksetzen und Dateiimport wirken auf alle
+Ergebnisansichten. Die separate Duplikatsuche bleibt erhalten.
+
+- **Basis:** Zeichen mit und ohne Leerzeichen, Wörter nach Whitespace und
+  Unicode-Buchstaben, Sätze und Absätze.
+- **Lesbarkeit:** bisherige Flesch- und Wiener-Näherungswerte, mittlere Wort- und
+  Satzlänge, Anteil langer Wörter (>6 Zeichen) mit Balken.
+- **Wortschatz:** Unique Words, Type-Token-Ratio, längstes Wort,
+  Wortlängen-Verteilung und Top 12 Wörter pro Text.
+- **Zeit & Wolke:** Lesezeit mit 200 und 250 Wörtern/min, Sprechzeit mit 130
+  Wörtern/min und zwei lokale Wortwolken mit gemeinsamer Häufigkeitsskala.
+- Numerische Werte werden in Original (Alt), Neue Version (Neu) und Δ (Neu − Alt)
+  dargestellt. Differenzen beziehen sich auf die angezeigte Rundung; PP steht
+  für Prozentpunkte. Nicht definierte Lesbarkeitswerte werden als „—“ gezeigt.
+- Der gemeinsame Stoppwortfilter betrifft nur Top-Wörter und Wortwolken.
+  „Leerzeichen ignorieren“ und Vergleichstiefe ändern keine Analysekennzahlen.
+- „Ergebnis kopieren“ übernimmt in der Analyseansicht die Textstatistiken,
+  Differenzen, Wortlängen-Verteilungen und Top-Wörter als tabellarischen Text
+  (nicht die grafischen Wortwolken). In den Diff-Ansichten bleibt der bisherige
+  Text-Export erhalten.
+
+### Methodische Hinweise
+
+Die Analyse übernimmt die Zählregeln und die beiden Lesbarkeitsformeln der
+bisherigen Textanalyse-App. Die dort implementierten Formeln entsprechen nicht
+den standardkonformen Amstad- und Wiener-Sachtextformeln. Damit frühere Werte
+weiter vergleichbar bleiben, wurden sie **nicht** geändert und werden in der
+Oberfläche ausdrücklich als Altformeln gekennzeichnet. Sie eignen sich daher
+nicht als normgerechte Lesbarkeitsindizes.
+
+HTML wird als unveränderter Quelltext gezählt, nicht als gerenderter Seiteninhalt.
+Die Zeitdarstellung rundet auf ganze Sekunden (mit korrektem Minutenübertrag).
+Die lokale Wortwolke zeigt bis zu 65 Begriffe je Text; tatsächliche Platzierung
+und Größe hängen zusätzlich vom verfügbaren Platz ab.
 
 ## Bereitstellung
 
-Den gesamten Inhalt dieses Ordners auf einen **HTTPS**-Webserver oder statischen Hostingdienst hochladen. Alle Dateien und der Ordner `icons/` müssen gemeinsam verfügbar sein. Danach die URL im Browser öffnen und über die Browserfunktion **Installieren / Zum Startbildschirm hinzufügen** installieren. In Chrome/Edge erscheint ggf. zusätzlich die Schaltfläche „App installieren“ in der Anwendung.
+Den gesamten Inhalt dieses Ordners auf denselben **HTTPS**-Webserver bzw.
+statischen Hostingdienst hochladen. Die bisherige Basis-URL von HTML Diff kann
+weiterverwendet werden. Die Manifest-ID, Start-URL, Scope und Icons bleiben
+unverändert; der Cache-Name wurde auf `html-diff-pwa-v2` erhöht. Der alte
+HTML-Diff-Cache wird bei Aktivierung des neuen Service Workers entfernt.
 
-## Lokal testen
+Danach die URL im Browser öffnen und über „Installieren / Zum Startbildschirm
+hinzufügen“ installieren. In Chrome/Edge erscheint ggf. „App installieren“.
 
-Im PWA-Ordner einen lokalen Server starten, z. B.:
+### Lokal testen
+
+Im entpackten Ordner einen Server starten, beispielsweise:
 
     python3 -m http.server 8080
 
-Dann `http://localhost:8080/` öffnen und nach dem ersten erfolgreichen Laden bei Bedarf die Netzwerkverbindung trennen. Die App bleibt offline nutzbar.
+Anschließend `http://localhost:8080/` öffnen. Nach dem ersten vollständigen
+Laden und der Service-Worker-Aktivierung ist Offline-Betrieb vorgesehen.
+Direktes Öffnen der `index.html` per Doppelklick funktioniert ebenfalls für
+Vergleich und Analyse, sofern die beiden lokalen Skripte daneben liegen;
+PWA-Installation und Service Worker benötigen HTTPS oder localhost.
 
-**Wichtig:** Beim direkten Öffnen von `index.html` per Doppelklick (`file://`) funktioniert die normale Diff-App, aber Service Worker und installierbare PWA-Eigenschaften benötigen `localhost` oder HTTPS.
+## Dateien
 
-## Enthaltene Dateien
-
-- `index.html` – vorhandene App mit PWA-Integration
-- `manifest.webmanifest` – Name, Startseite, Darstellung, Icons
-- `sw.js` – Offline-Cache ausschließlich für statische App-Dateien
-- `icons/` – App-, Maskable- und Apple-Icons
-
-Beim Bearbeiten des Service Workers die `CACHE_NAME`-Version erhöhen, damit veraltete App-Dateien entfernt werden. Die Navigation lädt online bevorzugt die aktuelle `index.html` und verwendet bei Offline-Betrieb die gecachte Version.
+- `index.html` – gemeinsame App-Oberfläche, Diff, Duplikatsuche und Integration
+- `text-analysis.js` – lokale Analysefunktionen und Vergleichsansicht
+- `wordcloud.js` – lokale Canvas-Wortwolken, aus der Textanalyse übernommen und angepasst
+- `manifest.webmanifest` – unveränderte PWA-Identität, aktualisierte Beschreibung
+- `sw.js` – Offline-Cache der App-Shell einschließlich beider neuer Skripte
+- `boiler-room.json` – technische Version 2 und vollständige Ressourcenliste
+- `icons/` – unveränderte Icons
 
 ## Boiler Room – Metadatenstandard v2
 
-Die drei öffentlichen Schnittstellendateien `manifest.webmanifest`,
-`boiler-room.json` und `sw.js` liegen im selben Basis-URL-Verzeichnis.
-Der vorhandene Einstiegspunkt ist `index.html`; Manifest-ID, Scope und
-Service-Worker-Verhalten bleiben unverändert. Die Workspace-Zuordnung
-(z. B. `workspace_entry` in `repos.js`) erfolgt weiterhin separat.
+`manifest.webmanifest`, `boiler-room.json` und `sw.js` liegen weiterhin im selben
+Basis-URL-Verzeichnis. Die technische App-Version ist von 1 auf 2 erhöht;
+`schema_version` bleibt 2. Workspace-Zuordnung (z. B. `workspace_entry` in
+`repos.js`) erfolgt weiterhin separat. `created: null` wurde beibehalten, da das
+Datum der Erstveröffentlichung nicht belegt ist. `updated: 2026-11-25` ist das
+Datum dieses Paketstands; bei späterer Veröffentlichung entsprechend anpassen.
 
-- `boiler-room.json` enthält die technische App-Version und Offline-Ressourcen.
-- Technische Version `1`: erstmalige Zuordnung zum Boiler-Room-Standard.
-  Im gelieferten Altbestand ist keine technische App-Version dokumentiert;
-  `html-diff-pwa-v1` ist ausschließlich die vorhandene Cache-Kennung.
-  Diese bleibt unverändert. Künftige veröffentlichte App-Stände erhalten
-  eine höhere technische Version in `boiler-room.json`.
-- `created: null`: Das Datum der Erstveröffentlichung ist aus dem gelieferten
-  Archiv nicht belegbar. Dateizeitstempel sind kein Veröffentlichungsnachweis.
-- `updated: 2026-11-25`: Datum des hier erstellten Paketstands, vorgesehen
-  für die Veröffentlichung an diesem Datum. Bei späterer Erstveröffentlichung
-  dieses Paketstands den Wert auf das tatsächliche Veröffentlichungsdatum setzen.
-- Offline-Modus `full`: Vergleich, Duplikatsuche und Dateiimport laufen lokal.
-  Das Kopieren hängt wie bisher von den Browserberechtigungen ab, nicht von
-  einer Internetverbindung. Die Browserinstallation ist vom Browserkontext
-  abhängig. Die Ressourcenliste enthält auch das Service-Worker-Skript für
-  die bestehende PWA-Integration; sie ändert nicht dessen Cache-Strategie.
-- Nicht belegbare optionale Angaben (Autor, Lizenz, Versionsbezeichnung,
-  veröffentlichte Änderungshistorie) wurden nicht ergänzt.
+Offline-Modus `full`: Sämtliche Analyse-, Vergleichs-, Duplikat- und Importfunktionen
+sind lokal implementiert. Kopieren und Installation hängen von den jeweiligen
+Browserberechtigungen ab. Alle statischen Laufzeitdateien sind in der Ressourcenliste
+enthalten. Bei Änderungen der App-Shell die Cache-Version entsprechend erhöhen.
 
-Für die Prüfung der Metadaten die mit dem Boiler-Room-Standard v2 gelieferte
-`boiler-room.schema.json` mit aktivierter Datumsformatprüfung verwenden.
+## Integrationsprüfung (25.11.2026)
 
-### Integrationsprüfung (25.11.2026)
-
-- Bestanden: JSON-Schema v2 einschließlich Datumsformatprüfung.
-- Bestanden: Manifest-Pflichtfelder, unveränderte PWA-Identität und tatsächliche
-  PNG-Icon-Abmessungen.
-- Bestanden: Alle drei Schnittstellendateien sowie alle neun Einträge in
-  `files` über einen lokalen HTTP-Server unter einem App-Unterpfad abrufbar
-  (HTTP 200, unveränderte Dateiinhalte, JavaScript-MIME-Typ für `sw.js`).
-- Bestanden: JavaScript-Syntax von Inline-App-Skript und Service Worker;
-  statischer Abgleich der Offline-Ressourcen mit der vorhandenen App-Shell.
-- Bestanden: Alle ursprünglichen Dateien außer der ergänzten README sind
-  byteidentisch zum gelieferten Archiv.
-- Nicht bestätigt: Browserbasierter Offline-Neustart, praktische App-Funktion
-  und iframe-Nutzung. Der lokale Chromium-Test wurde bei der Navigation
-  durch die Testumgebung blockiert (`ERR_BLOCKED_BY_ADMINISTRATOR`).
-  Die Einstufung `full` beruht auf dem vorhandenen Quellcode, der vollständigen
-  lokalen Ressourcenliste und der bestehenden Service-Worker-Implementierung,
-  nicht auf einem erfolgreich ausgeführten Offline-Browsertest.
-- Offen: Prüfung an der tatsächlichen öffentlichen Basis-URL und im echten
-  Boiler-Room-Workspace nach Bereitstellung. Insbesondere iframe-Berechtigungen
-  für Zwischenablage, PWA-Installation und Service Worker sind dort zu prüfen.
+- JavaScript-Syntax aller Skripte und Inline-App-Code geprüft.
+- Chromium-Funktionstest mit in die Testseite eingebetteten lokalen Skripten:
+  Diff-Ansichten, Analysekennzahlen und Differenzen, Stoppwortfilter, Wortwolken,
+  Seitenwechsel, manueller/automatischer Vergleich, Reset, Duplikatsuche,
+  Dateiimport, leere bzw. rein numerische Texte und mobile Ansicht geprüft.
+  Kopiertext beider Ansichten über eine simulierte Zwischenablage geprüft.
+  Alle Ressourcen über einen lokalen HTTP-Server mit HTTP 200 verifiziert.
+- Manifest-Identität und Icon-Dateien unverändert; lokale Laufzeitressourcen in
+  Metadaten und Service-Worker-App-Shell abgeglichen. Das externe Boiler-Room-
+  JSON-Schema wurde nicht mitgeliefert; eine erneute Schema-Validierung ist offen.
+- Einschränkung: Die Navigation zu lokalen Dateien bzw. dem lokalen Testserver
+  wird in der Testumgebung durch die Browser-Richtlinie blockiert. Installation,
+  tatsächlicher Service-Worker-Offline-Neustart und Nutzung im Boiler-Room-iframe
+  sind daher noch auf der Ziel-URL zu prüfen. Der eingebettete Browser-Test
+  prüft die App-Logik, nicht die HTTP-/Offline-Auslieferung.

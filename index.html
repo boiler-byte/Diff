@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="dark">
   <meta name="theme-color" content="#0e1420">
-  <meta name="description" content="HTML- und Textversionen vergleichen und doppelte Zeilen, Wörter oder Blöcke erkennen – lokal und offline.">
+  <meta name="description" content="HTML- und Textversionen vergleichen, Textstatistiken gegenüberstellen und Duplikate erkennen – lokal und offline.">
   <meta name="application-name" content="HTML Diff">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -13,7 +13,7 @@
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" type="image/svg+xml" href="./icons/favicon.svg">
   <link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon.png">
-  <title>HTML / Text Diff - Lokaler Vergleich</title>
+  <title>HTML / Text Diff – Vergleich &amp; Analyse</title>
   <style>
     :root {
       color-scheme: dark;
@@ -210,6 +210,62 @@
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
     }
+    /* Text analysis: same design system as the Diff result. */
+    .analysis-toolbar { display:flex; justify-content:space-between; align-items:flex-start; gap:12px 20px; flex-wrap:wrap; padding:17px 23px 0; }
+    .analysis-toolbar p { flex:1 1 300px; margin:0; color:var(--muted); font-size:12px; }
+    .analysis-toolbar .toggle-label { white-space:normal; }
+    .analysis-content { padding:17px 23px 23px; min-width:0; }
+    .analysis-grid { display:grid; grid-template-columns:minmax(0,1fr); gap:16px; }
+    .analysis-panel { min-width:0; border:1px solid var(--border); background:var(--surface-2); border-radius:12px; overflow:hidden; }
+    .analysis-panel h3 { margin:0; padding:14px 15px; font-size:15px; font-weight:775; background:var(--surface-3); border-bottom:1px solid var(--border); }
+    .analysis-table { width:100%; table-layout:fixed; border-collapse:collapse; font-size:12px; }
+    .analysis-table th, .analysis-table td { padding:10px 12px; vertical-align:top; overflow-wrap:anywhere; border-bottom:1px solid var(--border); }
+    .analysis-table thead th { font-size:11px; color:var(--muted); font-weight:750; text-align:right; }
+    .analysis-table th:first-child { width:43%; text-align:left; }
+    .analysis-table th:last-child { width:17%; }
+    .analysis-table tbody th { font-weight:600; text-align:left; color:var(--muted); }
+    .analysis-table td { text-align:right; }
+    .analysis-table tbody tr:last-child > * { border-bottom:0; }
+    .analysis-number { font-family:var(--code); font-variant-numeric:tabular-nums; }
+    .analysis-word-value { font-weight:650; }
+    .analysis-table .analysis-old, .analysis-old { color:var(--red); }
+    .analysis-table .analysis-new, .analysis-new { color:var(--green); }
+    .analysis-table .analysis-delta { color:var(--accent-hover); background:rgba(130,148,255,.045); }
+    .analysis-meter { height:4px; background:var(--border); border-radius:3px; margin-top:6px; overflow:hidden; }
+    .analysis-meter span { display:block; height:100%; background:var(--accent); border-radius:inherit; }
+    .analysis-extra { padding:14px 15px; border-top:1px solid var(--border); }
+    .analysis-extra h4 { margin:0 0 10px; font-size:12px; color:var(--text); font-weight:750; }
+    .analysis-pair { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+    .analysis-side { min-width:0; border:1px solid var(--border); background:var(--surface); border-radius:9px; padding:10px; }
+    .analysis-side-label { font-size:11px; font-weight:750; margin-bottom:9px; }
+    .analysis-chips { display:flex; flex-wrap:wrap; gap:5px; max-height:180px; overflow:auto; }
+    .analysis-chip { background:var(--surface-3); border:1px solid var(--border); border-radius:7px; padding:3px 7px; font:11px/1.5 var(--code); overflow-wrap:anywhere; max-width:100%; }
+    .analysis-muted { color:var(--muted); font-size:12px; margin:0; }
+    .analysis-cloud { height:clamp(180px,26vw,320px); min-width:0; display:grid; place-items:center; overflow:hidden; text-align:center; }
+    .analysis-note { padding:10px 15px; margin:0; border-top:1px solid var(--border); color:var(--muted); font-size:11px; }
+    @media(min-width:1180px) {
+      .analysis-grid { grid-template-columns:repeat(2,minmax(0,1fr)); align-items:start; }
+      .analysis-wide { grid-column:1/-1; }
+    }
+    @media(max-width:670px) {
+      .analysis-toolbar { padding:14px 12px 0; }
+      .analysis-content { padding:12px; }
+      .analysis-grid { gap:12px; }
+      .analysis-table th, .analysis-table td { padding:9px 6px; font-size:11px; }
+      .analysis-table th:first-child { width:39%; }
+      .analysis-table th:last-child { width:19%; }
+      .analysis-table thead th { font-size:10px; }
+      .analysis-extra { padding:12px 9px; }
+      .analysis-side { padding:8px; }
+      .analysis-pair { gap:7px; }
+      .analysis-cloud { height:200px; }
+      .result-controls .segmented { flex-wrap:wrap; max-width:100%; }
+      .result-controls .segmented button { padding:5px 9px; }
+    }
+    @media(max-width:390px) {
+      .analysis-pair { grid-template-columns:1fr; }
+      .analysis-cloud { height:230px; }
+    }
   </style>
 </head>
 <body>
@@ -324,6 +380,7 @@
               <div class="segmented" role="group" aria-label="Darstellungsmodus">
                 <button type="button" id="sideButton" aria-pressed="true">Side-by-Side</button>
                 <button type="button" id="inlineButton" aria-pressed="false">Inline-Diff</button>
+                <button type="button" id="analysisButton" aria-pressed="false" aria-controls="analysisView">Analyse</button>
               </div>
               <button class="btn btn-subtle" id="copyButton" type="button" disabled>Ergebnis kopieren</button>
             </div>
@@ -333,7 +390,7 @@
             <span class="stat removed">- <b id="removedCount">0</b> entfernt</span>
             <span class="stat modified">~ <b id="modifiedCount">0</b> ge&auml;ndert</span>
           </div>
-          <div class="legend" aria-label="Farblegende">
+          <div class="legend" id="diffLegend" aria-label="Farblegende">
             <span class="legend-item"><i class="legend-swatch plus" aria-hidden="true"></i> Hinzugef&uuml;gt</span>
             <span class="legend-item"><i class="legend-swatch minus" aria-hidden="true"></i> Entfernt</span>
             <span class="legend-item"><i class="legend-swatch change" aria-hidden="true"></i> Ge&auml;ndert</span>
@@ -351,6 +408,13 @@
           <div class="diff-inner hidden" id="diffInner"></div>
         </div>
         <div class="load-area hidden" id="loadArea"><button class="btn btn-subtle" type="button" id="loadMoreButton">Weitere Zeilen anzeigen</button></div>
+        <div id="analysisView" class="hidden" aria-label="Textanalyse im Vergleich">
+          <div class="analysis-toolbar">
+            <p>Textanalyse beider Versionen. Ausgewertet wird die unveränderte Eingabe, bei HTML der Quelltext. Δ = Neu − Alt; Diff-Optionen ändern die Kennzahlen nicht.</p>
+            <label class="toggle-label" title="Filtert nur häufigste Wörter und Wortwolken, nicht die übrigen Kennzahlen"><input type="checkbox" id="analysisStopwords" checked> Stoppwörter ausblenden</label>
+          </div>
+          <div id="analysisContent" class="analysis-content"></div>
+        </div>
       </section>
 
       <section class="results hidden" id="duplicateResults" role="tabpanel" aria-labelledby="duplicateTab" aria-label="Duplikat-Analyse">
@@ -384,6 +448,8 @@
     </main>
   </div>
 
+  <script src="./wordcloud.js"></script>
+  <script src="./text-analysis.js"></script>
   <script>
     (() => {
       'use strict';
@@ -407,6 +473,9 @@
         current: null,
         cache: null
       };
+
+      const textAnalysis = new TextAnalysis.Comparison($('analysisContent'), $('analysisStopwords'));
+      textAnalysis.clear();
 
       function normalizeLine(value, ignore) {
         return ignore ? value.replace(/[^\S\r\n]/g, '') : value;
@@ -942,6 +1011,7 @@
       function updatePressed() {
         $('sideButton').setAttribute('aria-pressed', String(state.view === 'side'));
         $('inlineButton').setAttribute('aria-pressed', String(state.view === 'inline'));
+        $('analysisButton').setAttribute('aria-pressed', String(state.view === 'analysis'));
         $('lineButton').setAttribute('aria-pressed', String(state.grain === 'line'));
         $('wordButton').setAttribute('aria-pressed', String(state.grain === 'word'));
       }
@@ -949,6 +1019,18 @@
       function renderResult() {
         updatePressed();
         const result = state.current;
+        const isAnalysis = state.view === 'analysis';
+        $('analysisView').classList.toggle('hidden', !isAnalysis);
+        $('stats').classList.toggle('hidden', isAnalysis);
+        $('diffLegend').classList.toggle('hidden', isAnalysis);
+        diffViewport.classList.toggle('hidden', isAnalysis);
+        if (isAnalysis) {
+          $('loadArea').classList.add('hidden');
+          $('copyButton').disabled = !result;
+          if (result && state.cache) textAnalysis.update(state.cache.old, state.cache.newer);
+          else textAnalysis.clear();
+          return;
+        }
         if (!result) {
           $('emptyState').classList.remove('hidden');
           diffInner.classList.add('hidden');
@@ -1058,6 +1140,7 @@
       function copiedText() {
         const result = state.current;
         if (!result) return '';
+        if (state.view === 'analysis') return textAnalysis.copyText();
         const out = [
           'HTML / Text Diff',
           '+ ' + result.counts.added + ' hinzugefuegt | - ' + result.counts.removed + ' entfernt | ~ ' + result.counts.modified + ' geaendert',
@@ -1450,7 +1533,10 @@
         for (const id of ['diffActions','diffOptions','diffResults']) $(id).classList.toggle('hidden', duplicate);
         for (const id of ['duplicateActions','duplicateSettings','duplicateResults']) $(id).classList.toggle('hidden', !duplicate);
         if (duplicate) analyzeDuplicates();
-        else $('compareStatus').textContent = 'Versionsvergleich aktiv.';
+        else {
+          $('compareStatus').textContent = 'Versionsvergleich aktiv.';
+          if (state.view === 'analysis') renderResult();
+        }
       }
 
       $('diffTab').addEventListener('click', () => setToolMode('diff'));
@@ -1605,6 +1691,7 @@
         newInput.value = '';
         state.current = null;
         state.cache = null;
+        textAnalysis.clear();
         state.shown = ROW_BATCH;
         $('emptyTitle').textContent = 'Noch kein Vergleich';
         $('emptyDescription').textContent = 'F\u00fcge oben zwei Texte ein. Unterschiede erscheinen nach dem Tippen oder einem Klick auf "Vergleichen".';
@@ -1630,6 +1717,8 @@
       });
       $('sideButton').addEventListener('click', () => setView('side'));
       $('inlineButton').addEventListener('click', () => setView('inline'));
+      $('analysisButton').addEventListener('click', () => setView('analysis'));
+      $('analysisStopwords').addEventListener('change', () => { if (state.view === 'analysis') renderResult(); });
       $('lineButton').addEventListener('click', () => setGrain('line'));
       $('wordButton').addEventListener('click', () => setGrain('word'));
       $('copyButton').addEventListener('click', copyResult);
